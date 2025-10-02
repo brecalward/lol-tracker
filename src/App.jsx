@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
 import { Button } from "@/components/ui/button";
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card'
 import "./index.css"
 
-const API_KEY = "RGAPI-a6c48da6-a6f5-4397-be2e-9e9fb20ade4c";
+const API_KEY = "RGAPI-1bf5145c-315f-40a4-a8f2-34fd7e41c6cd";
 const BASE_URL = "https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id"
 
 function App() {
@@ -16,7 +18,7 @@ function App() {
     if (!gameName || !gameTag) return;
     try {
 
-        const res = await fetch(`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${gameTag}?api_key=RGAPI-a6c48da6-a6f5-4397-be2e-9e9fb20ade4c`);
+        const res = await fetch(`${BASE_URL}/${gameName}/${gameTag}?api_key=${API_KEY}`);
         const data = await res.json();
         console.log(data)
         setAccount({gameName: data.gameName, tagLine: data.tagLine})
@@ -30,16 +32,22 @@ function App() {
 
   return (
     <>
-      <label htmlFor="gameName" value="Game name:" >Game name:</label>
-      <input id="gameName" value={gameName} onChange={(e) => setGameName(e.target.value)}/>
-      <label htmlFor="gameTag" value="Game name:" >Game tag:</label>
-      <input id="gameTag" value={gameTag} onChange={(e) => setGameTag(e.target.value)}/>
-      <button onClick={handleSearchNameAndTag}>Search</button>
-      <Button className="mt-4 w-full bg-green-500 hover:bg-green-600">Click me</Button>
+    <Card className="bg-black text-white">
+
+      <div className="flex justify-center gap-10 mt-20">
+        <label htmlFor="gameName" value="Game name:" >Game name:</label>
+        <Input id="gameName" className="w-60" value={gameName} onChange={(e) => setGameName(e.target.value)}/>
+      </div>
+      <div className="flex justify-center gap-10 mt-10">
+        <label htmlFor="gameTag" value="Game name:" >Game tag:</label>
+        <Input id="gameTag" className="w-60" value={gameTag} onChange={(e) => setGameTag(e.target.value)}/>
+      </div>
+      <Button className="mt-15 w-40 bg-green-500 hover:bg-green-600" onClick={handleSearchNameAndTag}>Search</Button>
       <br/>
       <br/>
       <br/>
       {account && `${account.gameName} #${account.tagLine}`}
+    </Card>
     </>
   )
 }
