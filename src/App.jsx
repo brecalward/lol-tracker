@@ -47,7 +47,6 @@ function App() {
 			console.log(error);
 		}
 	}
-	console.log("API Key:", import.meta.env.VITE_API_KEY);
 	useEffect(
 		function () {
 			async function handleSearchChampionStats() {
