@@ -14,8 +14,7 @@ import {
 } from "@/components/ui/table";
 import "./index.css";
 
-const API_KEY = "RGAPI-08ae8f8b-a506-4703-bba3-d023787017a8";
-
+const API_KEY = import.meta.env.VITE_API_KEY; // Accesses variables prefixed with VITE_
 const BASE_URL =
 	"https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id";
 const CHAMP_DATA =
@@ -48,7 +47,7 @@ function App() {
 			console.log(error);
 		}
 	}
-
+	console.log("API Key:", import.meta.env.VITE_API_KEY);
 	useEffect(
 		function () {
 			async function handleSearchChampionStats() {
@@ -69,16 +68,6 @@ function App() {
 		[account]
 	);
 
-	useEffect(function () {
-		async function fetchChampData() {
-			const res = await fetch(
-				"https://ddragon.leagueoflegends.com/cdn/15.19.1/data/en_US/champion.json"
-			);
-			const data = await res.json();
-			setAllChamps(data.data);
-		}
-		fetchChampData();
-	}, []);
 	function getChampionById(id) {
 		for (const champName in allChamps) {
 			const champion = allChamps[champName];
@@ -115,7 +104,7 @@ function App() {
 		}
 
 		fetchAllChampions();
-	});
+	}, []);
 
 	return (
 		<>
@@ -168,35 +157,33 @@ function App() {
 					</TableHeader>
 					<TableBody>
 						{champInfo?.map((champ) => (
-							<>
-								<TableRow key={champ.championId}>
-									<TableCell className="font-medium">
-										{champ.championId}
-									</TableCell>
-									<TableCell className="font-medium">
-										{getChampionById(champ.championId)}
-									</TableCell>
-									<TableCell className="font-medium">
-										<img
-											src={`https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/${
-												champData[champ.championId].image.full
-											}`}
-											alt={champData.name}
-											width="64"
-											height="64"
-										/>
-									</TableCell>
-									<TableCell className="font-medium">
-										{champData[champ.championId].partype}
-									</TableCell>
-									<TableCell className="font-medium">
-										{champ.championPoints}
-									</TableCell>
-									<TableCell className="font-medium">
-										{champ.championLevel}
-									</TableCell>
-								</TableRow>
-							</>
+							<TableRow key={champ.championId}>
+								<TableCell className="font-medium">
+									{champ.championId}
+								</TableCell>
+								<TableCell className="font-medium">
+									{getChampionById(champ.championId)}
+								</TableCell>
+								<TableCell className="font-medium">
+									<img
+										src={`https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/${
+											champData[champ.championId].image.full
+										}`}
+										alt={champData.name}
+										width="64"
+										height="64"
+									/>
+								</TableCell>
+								<TableCell className="font-medium">
+									{champData[champ.championId].partype}
+								</TableCell>
+								<TableCell className="font-medium">
+									{champ.championPoints}
+								</TableCell>
+								<TableCell className="font-medium">
+									{champ.championLevel}
+								</TableCell>
+							</TableRow>
 						))}
 					</TableBody>
 				</Table>
