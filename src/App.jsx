@@ -161,7 +161,7 @@ function App() {
 									{champ.championId}
 								</TableCell>
 								<TableCell className="font-medium">
-									{getChampionById(champ.championId)}
+									{champData[champ.championId].name}
 								</TableCell>
 								<TableCell className="font-medium">
 									<img
