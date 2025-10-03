@@ -23,14 +23,17 @@ const CHAMP_DATA =
 function App() {
 	const [gameName, setGameName] = useState("");
 	const [gameTag, setGameTag] = useState("");
+	const [summonerLevel, setSummonerLevel] = useState(null);
 	const [account, setAccount] = useState(null);
 	const [champInfo, setChampInfo] = useState(null);
 	const [allChamps, setAllChamps] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [champData, setChampData] = useState({});
 
+
 	async function handleSearchNameAndTag() {
 		if (!gameName || !gameTag) return;
+		setAccount(null)
 		try {
 			const res = await fetch(
 				`${BASE_URL}/${gameName}/${gameTag}?api_key=${API_KEY}`
@@ -45,6 +48,7 @@ function App() {
 			// setPuuid(data.puuid)
 		} catch (error) {
 			console.log(error);
+			console.error(error.message)
 		}
 	}
 	useEffect(
@@ -60,21 +64,27 @@ function App() {
 					console.log(data);
 				} catch (error) {
 					console.log(error);
+					console.error(error.message)
+				}
+			}
+			async function getAccountLevel() {
+				if (!account) return;
+				try {
+					const res = await fetch(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${account.puuid}?api_key=${API_KEY}`);
+					const data = await res.json();
+					console.log(data.summonerLevel);
+					setSummonerLevel(data.summonerLevel)
+				} catch(error) {
+					console.log(error)
+					console.error(error.message)
 				}
 			}
 			handleSearchChampionStats();
+			getAccountLevel()
 		},
 		[account]
 	);
 
-	function getChampionById(id) {
-		for (const champName in allChamps) {
-			const champion = allChamps[champName];
-			if (champion.key === String(id)) {
-				return champion.name;
-			}
-		}
-	}
 
 	useEffect(() => {
 		async function fetchAllChampions() {
@@ -139,7 +149,7 @@ function App() {
 				<br />
 				<br />
 				<br />
-				{account && `${account.gameName} #${account.tagLine}`}
+				{account && `${account.gameName} #${account.tagLine}`}<br/>{account && `Summoner Level: ${summonerLevel}`}
 			</Card>
 			<Card className="bg-black text-white p-5">
 				<Table>
