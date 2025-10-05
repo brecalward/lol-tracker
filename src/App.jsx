@@ -30,10 +30,9 @@ function App() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [champData, setChampData] = useState({});
 
-
 	async function handleSearchNameAndTag() {
 		if (!gameName || !gameTag) return;
-		setAccount(null)
+		setAccount(null);
 		try {
 			const res = await fetch(
 				`${BASE_URL}/${gameName}/${gameTag}?api_key=${API_KEY}`
@@ -48,7 +47,7 @@ function App() {
 			// setPuuid(data.puuid)
 		} catch (error) {
 			console.log(error);
-			console.error(error.message)
+			console.error(error.message);
 		}
 	}
 	useEffect(
@@ -64,27 +63,28 @@ function App() {
 					console.log(data);
 				} catch (error) {
 					console.log(error);
-					console.error(error.message)
+					console.error(error.message);
 				}
 			}
 			async function getAccountLevel() {
 				if (!account) return;
 				try {
-					const res = await fetch(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${account.puuid}?api_key=${API_KEY}`);
+					const res = await fetch(
+						`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${account.puuid}?api_key=${API_KEY}`
+					);
 					const data = await res.json();
 					console.log(data.summonerLevel);
-					setSummonerLevel(data.summonerLevel)
-				} catch(error) {
-					console.log(error)
-					console.error(error.message)
+					setSummonerLevel(data.summonerLevel);
+				} catch (error) {
+					console.log(error);
+					console.error(error.message);
 				}
 			}
 			handleSearchChampionStats();
-			getAccountLevel()
+			getAccountLevel();
 		},
 		[account]
 	);
-
 
 	useEffect(() => {
 		async function fetchAllChampions() {
@@ -114,6 +114,25 @@ function App() {
 
 		fetchAllChampions();
 	}, []);
+
+	useEffect(
+		function () {
+			if (!account) return;
+			async function fetchMatches() {
+				try {
+					const res = await fetch(
+						`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${account.puuid}/ids?start=0&count=20&api_key=${API_KEY}`
+					);
+					const data = await res.json();
+					console.log(data);
+				} catch (error) {
+					console.log(error);
+				}
+			}
+			fetchMatches();
+		},
+		[account]
+	);
 
 	return (
 		<>
@@ -149,7 +168,9 @@ function App() {
 				<br />
 				<br />
 				<br />
-				{account && `${account.gameName} #${account.tagLine}`}<br/>{account && `Summoner Level: ${summonerLevel}`}
+				{account && `${account.gameName} #${account.tagLine}`}
+				<br />
+				{account && `Summoner Level: ${summonerLevel}`}
 			</Card>
 			<Card className="bg-black text-white p-5">
 				<Table>
