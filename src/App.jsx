@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import "./App.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +13,16 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import "./index.css";
+import { initialState, accountReducer } from './reducer/accountReducer'
 
 const API_KEY = import.meta.env.VITE_API_KEY; // Accesses variables prefixed with VITE_
 const BASE_URL =
 	"https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id";
 const CHAMP_DATA =
 	"https://ddragon.leagueoflegends.com/cdn/15.19.1/data/en_US/champion.json";
+
+
+
 
 function App() {
 	const [gameName, setGameName] = useState("");
@@ -29,6 +33,7 @@ function App() {
 	const [allChamps, setAllChamps] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [champData, setChampData] = useState({});
+	const [state, dispatch] = useReducer(accountReducer, initialState);
 
 	async function handleSearchNameAndTag() {
 		if (!gameName || !gameTag) return;
@@ -39,6 +44,7 @@ function App() {
 			);
 			const data = await res.json();
 			console.log(data);
+			dispatch({type: "getNameAndTag", payload: {gameName: data.gameName, gameTag: data.tagLine}})
 			setAccount({
 				gameName: data.gameName,
 				tagLine: data.tagLine,
