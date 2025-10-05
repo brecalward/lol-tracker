@@ -13,74 +13,68 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import "./index.css";
-import { initialState, accountReducer } from './reducer/accountReducer'
+import { initialState, accountReducer } from "./reducers/AccountReducer";
+import { useAccountContext } from "./contexts/AccountContext";
 
 const API_KEY = import.meta.env.VITE_API_KEY; // Accesses variables prefixed with VITE_
-const BASE_URL =
-	"https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id";
 const CHAMP_DATA =
 	"https://ddragon.leagueoflegends.com/cdn/15.19.1/data/en_US/champion.json";
 
-
-
-
 function App() {
-	const [gameName, setGameName] = useState("");
-	const [gameTag, setGameTag] = useState("");
-	const [summonerLevel, setSummonerLevel] = useState(null);
-	const [account, setAccount] = useState(null);
-	const [champInfo, setChampInfo] = useState(null);
-	const [allChamps, setAllChamps] = useState(null);
-	const [isLoading, setIsLoading] = useState(false);
+	const [gameNameInput, setGameNameInput] = useState("");
+	const [gameTagInput, setGameTagInput] = useState("");
 	const [champData, setChampData] = useState({});
-	const [state, dispatch] = useReducer(accountReducer, initialState);
+	const { gameName, gameTag, puuid, dispatch, summonerLevel, champInfo } =
+		useAccountContext();
 
 	async function handleSearchNameAndTag() {
-		if (!gameName || !gameTag) return;
-		setAccount(null);
+		if (!gameNameInput || !gameTagInput) return;
+		dispatch({ type: "clearAccountInfo" });
 		try {
 			const res = await fetch(
-				`${BASE_URL}/${gameName}/${gameTag}?api_key=${API_KEY}`
+				`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameNameInput}/${gameTagInput}?api_key=${API_KEY}`
 			);
 			const data = await res.json();
-			console.log(data);
-			dispatch({type: "getNameAndTag", payload: {gameName: data.gameName, gameTag: data.tagLine}})
-			setAccount({
-				gameName: data.gameName,
-				tagLine: data.tagLine,
-				puuid: data.puuid,
+			console.log("Account info from riot api", data);
+			dispatch({
+				type: "getNameAndTag",
+				payload: {
+					gameName: data.gameName,
+					gameTag: data.tagLine,
+					puuid: data.puuid,
+				},
 			});
+
 			// setPuuid(data.puuid)
 		} catch (error) {
 			console.log(error);
-			console.error(error.message);
 		}
 	}
 	useEffect(
 		function () {
 			async function handleSearchChampionStats() {
-				if (!account) return;
+				if (!puuid) return;
 				try {
 					const res = await fetch(
-						`https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${account.puuid}?api_key=${API_KEY}`
+						`https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}?api_key=${API_KEY}`
 					);
 					const data = await res.json();
-					setChampInfo(data);
-					console.log(data);
+					dispatch({ type: "getAccountChampData", payload: data });
+					console.log("fetched champ info from riot api", data);
 				} catch (error) {
 					console.log(error);
 					console.error(error.message);
 				}
 			}
 			async function getAccountLevel() {
-				if (!account) return;
+				if (!puuid) return;
 				try {
 					const res = await fetch(
-						`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${account.puuid}?api_key=${API_KEY}`
+						`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${API_KEY}`
 					);
 					const data = await res.json();
 					console.log(data.summonerLevel);
-					setSummonerLevel(data.summonerLevel);
+					dispatch({ type: "getSummonerLevel", payload: data.summonerLevel });
 				} catch (error) {
 					console.log(error);
 					console.error(error.message);
@@ -89,7 +83,7 @@ function App() {
 			handleSearchChampionStats();
 			getAccountLevel();
 		},
-		[account]
+		[puuid, dispatch]
 	);
 
 	useEffect(() => {
@@ -114,6 +108,7 @@ function App() {
 					title: champion.title,
 				};
 			}
+			console.log("champ data fetched from external website", newChampData);
 
 			setChampData(newChampData); // Set state once after loop
 		}
@@ -123,21 +118,21 @@ function App() {
 
 	useEffect(
 		function () {
-			if (!account) return;
+			if (!puuid) return;
 			async function fetchMatches() {
 				try {
 					const res = await fetch(
-						`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${account.puuid}/ids?start=0&count=20&api_key=${API_KEY}`
+						`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=20&api_key=${API_KEY}`
 					);
 					const data = await res.json();
-					console.log(data);
+					console.log("List of match id's from riot api", data);
 				} catch (error) {
 					console.log(error);
 				}
 			}
 			fetchMatches();
 		},
-		[account]
+		[puuid]
 	);
 
 	return (
@@ -150,8 +145,8 @@ function App() {
 					<Input
 						id="gameName"
 						className="w-60"
-						value={gameName}
-						onChange={(e) => setGameName(e.target.value)}
+						value={gameNameInput}
+						onChange={(e) => setGameNameInput(e.target.value)}
 					/>
 				</div>
 				<div className="flex justify-center gap-10 mt-10">
@@ -161,8 +156,8 @@ function App() {
 					<Input
 						id="gameTag"
 						className="w-60"
-						value={gameTag}
-						onChange={(e) => setGameTag(e.target.value)}
+						value={gameTagInput}
+						onChange={(e) => setGameTagInput(e.target.value)}
 					/>
 				</div>
 				<Button
@@ -174,11 +169,17 @@ function App() {
 				<br />
 				<br />
 				<br />
-				{account && `${account.gameName} #${account.tagLine}`}
+				{gameName && `${gameName} #${gameTag}`}
 				<br />
-				{account && `Summoner Level: ${summonerLevel}`}
+				{summonerLevel && `Summoner Level: ${summonerLevel}`}
 			</Card>
 			<Card className="bg-black text-white p-5">
+				{champInfo?.length === 0 && (
+					<p className="text-white text-center mt-4">No champion data found.</p>
+				)}
+				{champInfo?.length > 0 && Object.keys(champData).length > 0 && (
+					<Table></Table>
+				)}
 				<Table>
 					<TableCaption>A list of your recent champions.</TableCaption>
 					<TableHeader>
@@ -192,35 +193,31 @@ function App() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{champInfo?.map((champ) => (
-							<TableRow key={champ.championId}>
-								<TableCell className="font-medium">
-									{champ.championId}
-								</TableCell>
-								<TableCell className="font-medium">
-									{champData[champ.championId].name}
-								</TableCell>
-								<TableCell className="font-medium">
-									<img
-										src={`https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/${
-											champData[champ.championId].image.full
-										}`}
-										alt={champData.name}
-										width="64"
-										height="64"
-									/>
-								</TableCell>
-								<TableCell className="font-medium">
-									{champData[champ.championId].partype}
-								</TableCell>
-								<TableCell className="font-medium">
-									{champ.championPoints}
-								</TableCell>
-								<TableCell className="font-medium">
-									{champ.championLevel}
-								</TableCell>
-							</TableRow>
-						))}
+						{champInfo?.map((champ) => {
+							const champDetails = champData[String(champ.championId)];
+							if (!champDetails) {
+								console.warn(`Missing champData for ID: ${champ.championId}`);
+								return null; // Skip this row
+							}
+
+							return (
+								<TableRow key={champ.championId}>
+									<TableCell>{champ.championId}</TableCell>
+									<TableCell>{champDetails.name}</TableCell>
+									<TableCell>
+										<img
+											src={`https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/${champDetails.image.full}`}
+											alt={champDetails.name}
+											width="64"
+											height="64"
+										/>
+									</TableCell>
+									<TableCell>{champDetails.partype}</TableCell>
+									<TableCell>{champ.championPoints}</TableCell>
+									<TableCell>{champ.championLevel}</TableCell>
+								</TableRow>
+							);
+						})}
 					</TableBody>
 				</Table>
 			</Card>
