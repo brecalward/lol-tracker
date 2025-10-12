@@ -64,8 +64,10 @@ export default function HistoryPage() {
 	}, []);
 	return (
 		<>
-			{previousMatches &&
-				previousMatches.map((match) => <Match match={match} />)}
+			<div className="mb-15">
+				{previousMatches &&
+					previousMatches.map((match) => <Match match={match} />)}
+			</div>
 		</>
 	);
 }

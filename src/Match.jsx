@@ -1,4 +1,5 @@
 export default function Match({ match }) {
+	console.log(match);
 	return (
 		<>
 			{match && (
@@ -7,10 +8,16 @@ export default function Match({ match }) {
 						{/* <img src={`${champData[match.champName].image.full}`} /> */}
 						{match.champName}
 					</h1>
-					<h2>Kills: {match.kills}</h2>
-					<h2>Deaths: {match.deaths}</h2>
-					<h2>Assists: {match.assists}</h2>
-					<h2>Win: {match.win}</h2>
+					<h2>
+						{match.kills} / {match.deaths} / {match.assists}
+					</h2>
+					<h2>
+						{match.win ? (
+							<p className="text-green-500">Won</p>
+						) : (
+							<p className="text-red-500">Lost</p>
+						)}
+					</h2>
 					<h2>CS: {match.totalMinionsKilled + match.neutralMinionsKilled}</h2>
 				</div>
 			)}
