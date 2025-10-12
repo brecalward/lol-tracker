@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAccountContext } from "./contexts/accountContext";
-import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
+import AccountInfo from "./AccountInfo";
 
 export default function SearchAccount() {
 	const [gameNameInput, setGameNameInput] = useState("");
@@ -20,6 +20,8 @@ export default function SearchAccount() {
 		profilePicture,
 	} = useAccountContext();
 	const API_KEY = import.meta.env.VITE_API_KEY;
+	const CHAMP_DATA =
+		"https://ddragon.leagueoflegends.com/cdn/15.19.1/data/en_US/champion.json";
 
 	async function handleSearchNameAndTag() {
 		if (!gameNameInput || !gameTagInput) return;
@@ -92,7 +94,7 @@ export default function SearchAccount() {
 			getRank();
 			getProfilePictureId();
 		},
-		[puuid]
+		[puuid, API_KEY, dispatch]
 	);
 
 	useEffect(
@@ -112,7 +114,63 @@ export default function SearchAccount() {
 			}
 			getProfilePicture();
 		},
-		[profilePictureId]
+		[profilePictureId, dispatch]
+	);
+
+	useEffect(
+		function () {
+			async function handleSearchChampionStats() {
+				if (!puuid) return;
+				try {
+					const res = await fetch(
+						`https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}?api_key=${API_KEY}`
+					);
+					const data = await res.json();
+					dispatch({ type: "getAccountChampData", payload: data });
+					console.log("fetched champ info from riot api", data);
+				} catch (error) {
+					console.log(error);
+					console.error(error.message);
+				}
+			}
+			async function getAccountLevel() {
+				if (!puuid) return;
+				try {
+					const res = await fetch(
+						`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${API_KEY}`
+					);
+					const data = await res.json();
+					console.log(data.summonerLevel);
+					dispatch({ type: "getSummonerLevel", payload: data.summonerLevel });
+				} catch (error) {
+					console.log(error);
+					console.error(error.message);
+				}
+			}
+			handleSearchChampionStats();
+			getAccountLevel();
+		},
+		[puuid, dispatch, API_KEY]
+	);
+
+	useEffect(
+		function () {
+			if (!puuid) return;
+			async function fetchMatches() {
+				try {
+					const res = await fetch(
+						`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=5&api_key=${API_KEY}`
+					);
+					const data = await res.json();
+					console.log("List of match id's from riot api", data);
+					dispatch({ type: "getPreviousMatches", payload: data });
+				} catch (error) {
+					console.log(error);
+				}
+			}
+			fetchMatches();
+		},
+		[puuid, dispatch, API_KEY]
 	);
 	return (
 		<>
@@ -155,33 +213,7 @@ export default function SearchAccount() {
 			) : (
 				""
 			)}
-			<br />
-			<br />
-			<br />
-			{profilePicture && gameName && (
-				<div className="flex">
-					<div className="rounded-full bg-rose-400 flex p-3 ml-15">
-						<Avatar>
-							<AvatarImage src={profilePicture} />
-							<AvatarFallback>CN</AvatarFallback>
-						</Avatar>
-
-						<p>{`${gameName} #${gameTag}`}</p>
-					</div>
-					<br />
-					<p className="ml-20">
-						<br />
-						{summonerLevel && `Summoner Level: ${summonerLevel}`}{" "}
-					</p>
-					<p className="ml-20">
-						{" "}
-						<br />
-						{tier && `${tier}: ${rank}`}
-					</p>
-				</div>
-			)}
-
-			{puuid}
+			<AccountInfo />
 		</>
 	);
 }
