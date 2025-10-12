@@ -3,13 +3,14 @@ export const initialState = {
 	gameTag: "",
 	summonerLevel: null,
 	puuid: "",
-	champInfo: null,
+	accountMasteryChampInfo: null,
 	tier: "",
 	rank: "",
 	profilePictureId: null,
 	profilePicture: null,
 	previousMatchesById: [],
 	previousMatches: [],
+	champData: [],
 };
 
 export const accountReducer = (state, action) => {
@@ -28,7 +29,7 @@ export const accountReducer = (state, action) => {
 		case "getSummonerLevel":
 			return { ...state, summonerLevel: action.payload };
 		case "getAccountChampData":
-			return { ...state, champInfo: action.payload };
+			return { ...state, accountMasteryChampInfo: action.payload };
 		case "getRank":
 			return { ...state, tier: action.payload.tier, rank: action.payload.rank };
 		case "getProfileId":
@@ -39,6 +40,8 @@ export const accountReducer = (state, action) => {
 			return { ...state, previousMatchesById: action.payload };
 		case "getGameData":
 			return { ...state, previousMatches: action.payload };
+		case "getChampData":
+			return { ...state, champData: action.payload };
 		default:
 			return state;
 	}

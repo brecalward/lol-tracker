@@ -5,8 +5,14 @@ import { useNavigate } from "react-router-dom";
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 export default function HistoryPage() {
-	const { previousMatchesById, previousMatches, puuid, gameName, dispatch } =
-		useAccountContext();
+	const {
+		previousMatchesById,
+		previousMatches,
+		puuid,
+		gameName,
+		dispatch,
+		champData,
+	} = useAccountContext();
 	const navigate = useNavigate();
 
 	useEffect(
@@ -46,6 +52,7 @@ export default function HistoryPage() {
 				const filtered = gameData.filter((item) => item !== null);
 				dispatch({ type: "getGameData", payload: filtered });
 			}
+			fetchAll();
 			// const gameData = previousMatchesById.forEach((match) => {
 			// 	fetchData(match);
 			// });
@@ -81,5 +88,22 @@ export default function HistoryPage() {
 			navigate("/");
 		}
 	}, []);
-	return <></>;
+	return (
+		<>
+			{previousMatches &&
+				previousMatches.map((match) => (
+					<div className="border mx-20 flex h-15 gap-5 items-center justify-center">
+						<h1>
+							{/* <img src={`${champData[match.champName].image.full}`} /> */}
+							{match.champName}
+						</h1>
+						<h2>Kills: {match.kills}</h2>
+						<h2>Deaths: {match.deaths}</h2>
+						<h2>Assists: {match.assists}</h2>
+						<h2>Win: {match.win}</h2>
+						<h2>CS: {match.totalMinionsKilled + match.neutralMinionsKilled}</h2>
+					</div>
+				))}
+		</>
+	);
 }

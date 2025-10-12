@@ -7,11 +7,14 @@ export default function MasteryPage() {
 	const { gameName } = useAccountContext();
 	const navigate = useNavigate();
 
-	useEffect(function () {
-		if (gameName === "") {
-			navigate("/");
-		}
-	}, []);
+	useEffect(
+		function () {
+			if (gameName === "") {
+				navigate("/");
+			}
+		},
+		[gameName, navigate]
+	);
 	return (
 		<>
 			<AccountTable />
