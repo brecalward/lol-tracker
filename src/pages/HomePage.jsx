@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 function HomePage() {
 	return (
 		<>
-			<Card className="bg-black text-white">
+			<Card className="bg-gray-900 text-white">
 				<NavBar />
 				<SearchAccount />
 				<Outlet />

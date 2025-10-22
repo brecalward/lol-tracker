@@ -20,6 +20,7 @@ export default function SearchAccount() {
 		profilePicture,
 	} = useAccountContext();
 	const API_KEY = import.meta.env.VITE_API_KEY;
+	const prevMatchCount = 10;
 	const CHAMP_DATA =
 		"https://ddragon.leagueoflegends.com/cdn/15.19.1/data/en_US/champion.json";
 
@@ -159,7 +160,7 @@ export default function SearchAccount() {
 			async function fetchMatches() {
 				try {
 					const res = await fetch(
-						`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=5&api_key=${API_KEY}`
+						`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=${prevMatchCount}&api_key=${API_KEY}`
 					);
 					const data = await res.json();
 					console.log("List of match id's from riot api", data);

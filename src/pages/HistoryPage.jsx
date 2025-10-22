@@ -16,6 +16,23 @@ export default function HistoryPage() {
 	} = useAccountContext();
 	const navigate = useNavigate();
 
+	function getGameMode(id) {
+		switch (id) {
+			case 420:
+				return "Ranked Solo/Duo";
+			case 440:
+				return "Ranked Flex";
+			case 450:
+				return "ARAM";
+			case 400:
+				return "Normal Draft";
+			case 430:
+				return "Normal Blind Pick";
+			default:
+				break;
+		}
+	}
+
 	useEffect(
 		function () {
 			if (previousMatchesById === undefined || previousMatchesById.length === 0)
@@ -39,6 +56,7 @@ export default function HistoryPage() {
 						lane: playerGame.individualPosition,
 						totalMinionsKilled: playerGame.totalMinionsKilled,
 						neutralMinionsKilled: playerGame.neutralMinionsKilled,
+						gameMode: getGameMode(data.info.queueId),
 					};
 				} catch (error) {
 					console.log(error);
