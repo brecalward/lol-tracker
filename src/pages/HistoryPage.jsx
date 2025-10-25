@@ -28,6 +28,8 @@ export default function HistoryPage() {
 				return "Normal Draft";
 			case 430:
 				return "Normal Blind Pick";
+			case 1700:
+				return "Arena";
 			default:
 				break;
 		}
@@ -82,7 +84,7 @@ export default function HistoryPage() {
 	}, []);
 	return (
 		<>
-			<div className="mb-15">
+			<div className="mb-15 flex flex-col gap-4">
 				{previousMatches &&
 					previousMatches.map((match) => <Match match={match} />)}
 			</div>

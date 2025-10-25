@@ -4,10 +4,10 @@ export default function Match({ match }) {
 	return (
 		<>
 			{match && (
-				<div className="border mx-20 flex h-15 gap-5 items-center">
+				<div className="border mx-20 flex h-15 gap-5 items-center rounded-full">
 					<h3
 						className={`mr-auto ml-5 px-3 rounded-full ${
-							match.gameMode.split(" ")[0] === "Ranked"
+							match?.gameMode?.split(" ")[0] === "Ranked"
 								? "bg-blue-500"
 								: "bg-indigo-700"
 						}`}
