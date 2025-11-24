@@ -17,29 +17,47 @@ export default function AccountInfo() {
   } = useAccountContext();
   return (
     <>
-      <div className=" flex mb-20 mt-10 items-center justify-between mx-25">
+      <div className="flex items-center justify-between mb-20 mt-10 mx-25 gap-8">
         {profilePicture && gameName && (
           <>
-            <div className="rounded-full bg-rose-400 flex p-3 min-w-64">
-              <Avatar>
-                <AvatarImage src={profilePicture} />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-
-              <p>{`${gameName} #${gameTag}`}</p>
+            {/* Profile with avatar and username */}
+            <div className="flex items-center bg-gray-800 rounded-full px-2 py-1 min-w-[16rem] gap-4">
+              <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
+                <img
+                  src={profilePicture}
+                  alt={`${gameName} avatar`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p className="text-white font-semibold text-lg select-none">
+                {`${gameName} #${gameTag}`}
+              </p>
             </div>
-            <p>{summonerLevel && `Summoner Level: ${summonerLevel}`} </p>
-            <p> {tier && `${tier}: ${rank}`}</p>
-            <p>{lp && `${lp} LP`}</p>
-            <Button onClick={() => navigate("/mastery")}>
-              Champion Mastery
-            </Button>
 
-            <Button onClick={() => navigate("/history")}>Match history</Button>
+            {/* Stats group */}
+            <div className="flex items-center gap-6 text-white text-sm font-medium whitespace-nowrap">
+              {summonerLevel && <p>Summoner Level: {summonerLevel}</p>}
+              {tier && rank && <p>{`${tier}: ${rank}`}</p>}
+              {lp && <p>{lp} LP</p>}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-4">
+              <Button
+                onClick={() => navigate("/mastery")}
+                className="bg-gray-800 hover:bg-gray-700 text-white"
+              >
+                Champion Mastery
+              </Button>
+              <Button
+                onClick={() => navigate("/history")}
+                className="bg-gray-800 hover:bg-gray-700 text-white"
+              >
+                Match history
+              </Button>
+            </div>
           </>
         )}
-
-        {/* {puuid} */}
       </div>
     </>
   );

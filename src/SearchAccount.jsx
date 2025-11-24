@@ -211,7 +211,7 @@ export default function SearchAccount() {
             />
           </div>
           <Button
-            className="mt-15 w-40 bg-green-500 hover:bg-green-600"
+            className="mt-15 w-40 bg-green-500 hover:bg-green-600 mb-8"
             onClick={handleSearchNameAndTag}
           >
             Search
