@@ -1,8 +1,12 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAccountContext } from "./contexts/accountContext";
-import AccountInfo from "./AccountInfo";
+const AccountInfo = React.lazy(() => import("./AccountInfo"));
+import Loading from "./Loading";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import ProfileSkeleton from "./ProfileSkeleton";
 
 export default function SearchAccount() {
   const [gameNameInput, setGameNameInput] = useState("");
@@ -174,6 +178,7 @@ export default function SearchAccount() {
     },
     [puuid, dispatch, API_KEY]
   );
+
   return (
     <>
       <div className="mt-5 flex justify-end mr-25">
@@ -215,7 +220,11 @@ export default function SearchAccount() {
       ) : (
         ""
       )}
-      <AccountInfo />
+      {!isExpanded && gameName && gameTag && (
+        <Suspense fallback={<ProfileSkeleton />}>
+          <AccountInfo />
+        </Suspense>
+      )}
     </>
   );
 }
